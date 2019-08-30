@@ -40,6 +40,14 @@ router.post("/api/login", (req, res) => {
     });
 });
 
+router.get("/api/users", restricted, (req, res) => {
+  Users.find()
+    .then(users => {
+      res.json(users);
+    })
+    .catch(err => res.send(err));
+});
+
 function genToken(user) {
   const payload = {
     subject: user.id,
@@ -52,6 +60,21 @@ function genToken(user) {
   };
 
   return jwt.sign(payload, secrets.jwtSecret, options);
+}
+
+function restricted(req, res, next) {
+  const header = req.headers["authorization"];
+
+  if (typeof header !== "undefined") {
+    const bearer = header.split(" ");
+    const token = bearer[1];
+
+    req.token = token;
+    next();
+  } else {
+    //If header is undefined return Forbidden (403)
+    res.status(401).json({ message: "You shall not pass" });
+  }
 }
 
 module.exports = router;
