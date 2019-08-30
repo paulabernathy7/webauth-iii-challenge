@@ -72,7 +72,6 @@ function restricted(req, res, next) {
     req.token = token;
     next();
   } else {
-    //If header is undefined return Forbidden (403)
     res.status(401).json({ message: "You shall not pass" });
   }
 }
